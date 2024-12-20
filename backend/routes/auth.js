@@ -176,27 +176,20 @@ router.post('/seller/logout', (req, res) => {
 });
 
 router.get('/verify-token', (req, res) => {
-  const token = req.headers['authorization']; // 'authorization' is case-insensitive, but it's safer to use the lower case
+  const token = req.headers['authorization']; // The token is passed directly in the header
 
-  // Check if token exists
+  console.log("the token is ", token);
+
   if (!token) {
     return res.status(403).json({ error: 'No token provided' });
   }
-
-  // The token comes with the 'Bearer ' prefix, so we need to remove it
-  const tokenWithoutBearer = token.split(' ')[1];
-
-  // If no token after 'Bearer ', it's invalid
-  if (!tokenWithoutBearer) {
-    return res.status(403).json({ error: 'No token provided' });
-  }
-
-  jwt.verify(tokenWithoutBearer, JWT_SECRET, (err, decoded) => {
+  jwt.verify(token, JWT_SECRET, (err,user) => {
     if (err) {
       return res.status(401).json({ error: 'Invalid or expired token' });
     }
-    res.status(200).json({ message: 'Token is valid', decoded });
+    res.status(200).json({ message: 'Token is valid', user});
   });
 });
+
 
 module.exports = router;

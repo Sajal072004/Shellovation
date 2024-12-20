@@ -1,3 +1,6 @@
+"use client";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -11,6 +14,51 @@ import {
 } from "@heroicons/react/solid";
 
 export default function Home() {
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const authToken = localStorage.getItem('authToken')
+      console.log(authToken);
+
+      try {
+        
+        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+        const response = await fetch(`${backendUrl}/auth/verify-token`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `${authToken}`,
+          },
+        });
+
+        if (response.ok) {
+          router.push("/dashboard");
+        }
+        
+        
+        setLoading(false);
+
+
+       
+      } catch (error) {
+        console.error("Authentication failed:", error);
+        setLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, [router]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="font-sans bg-white">
       {/* Navigation Bar */}
@@ -194,7 +242,7 @@ export default function Home() {
           />
           <button
             type="submit"
-            className="bg-red-500 px-6 py-2 rounded-r-lg hover:bg-red-600"
+            className="bg-red-500 px-6 py-2 rounded-r-lg text-white hover:bg-red-600"
           >
             Subscribe
           </button>
