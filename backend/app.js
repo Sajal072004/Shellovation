@@ -19,6 +19,9 @@ const Order = require('./models/order');
 const User = require('./models/user');
 const Address = require('./models/address');
 
+const JWT_SECRET = 'your-secret-key'
+
+
 // Middleware
 app.use(cors({
   origin: [' http://localhost:5173', 'http://localhost:3000', 'http://localhost:3000/signup','https://merabestie-orpin.vercel.app','https://merabestie-khaki.vercel.app','https://merabestie.com','https://hosteecommerce.vercel.app'], // Frontend URLs
@@ -56,7 +59,7 @@ app.use('/complaints', complaintsRoutes);
 app.use('/coupon',couponRoutes)
 
 // MongoDB Connection
-const uri = "mongodb+srv://ecommerce:ecommerce@ecommerce.dunf0.mongodb.net/";
+const uri = process.env.MONGO_URL;
 mongoose.connect(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true
@@ -428,14 +431,48 @@ app.put('/update-account-status', async (req, res) => {
 const otpStore = new Map();
 
 
+
+// GET /get-current-user route to find the user by token
+app.post('/get-current-user', async (req, res) => {
+  try {
+    // Extract userId from the request body
+    const { userId } = req.body; 
+
+    if (!userId) {
+      return res.status(400).json({ message: 'User ID is required' });
+    }
+
+    // Find the user using the provided userId
+    const user = await User.findOne({ userId: userId });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Return user info (you can choose what info to return)
+    res.json({
+      userId: user._id,
+      name: user.name,
+      email: user.email,
+      accountStatus: user.accountStatus,
+      phone: user.phone
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
 app.post('/find-my-order', async (req, res) => {
   try {
     console.log("find my order url is being hit");
     const { userId } = req.body;
     console.log("The user ID is:", userId);
 
-    // Check if userId is provided
+    
     if (!userId) {
+      console.log("user id not found ");
       return res.status(400).json({
         success: false,
         message: 'User ID is required'
@@ -445,6 +482,7 @@ app.post('/find-my-order', async (req, res) => {
     // Find the user by userId
     const user = await User.findOne({ userId });
     if (!user) {
+      console.log("the user is not found");
       return res.status(404).json({
         success: false,
         message: 'User not found'
@@ -458,15 +496,14 @@ app.post('/find-my-order', async (req, res) => {
 
     console.log("The orders are", orders);
   
-    // If no orders are found for the user, return an error
+    
     if (!orders || orders.length === 0) {
-      return res.status(404).json({
+      return res.status(200).json({
         success: false,
         message: 'No orders found for this user'
       });
     }
 
-    // Function to get product details for each productId and quantity
     const findProductDetails = async (productsOrdered) => {
       try {
         const productDetails = [];

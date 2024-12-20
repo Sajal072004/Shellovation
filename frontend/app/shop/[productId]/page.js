@@ -2,9 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { notFound } from "next/navigation"; // If you want to show a 404 page if product is not found
 import Link from "next/link";
-import { useRouter } from "next/navigation"; // For navigation
+import { useRouter, notFound } from "next/navigation"; // For navigation
 
 export default function ProductPage({ params }) {
   const { productId } = params; // Access productId from params
@@ -13,6 +12,17 @@ export default function ProductPage({ params }) {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [activeFilter, setActiveFilter] = useState("filter-none"); // Current filter
+
+  // Available filters
+  const filters = [
+    { name: "None", className: "filter-none" },
+    { name: "Grayscale", className: "filter grayscale" },
+    { name: "Sepia", className: "filter sepia" },
+    { name: "Blur", className: "filter blur-sm" },
+    { name: "Brightness", className: "filter brightness-125" },
+    { name: "Contrast", className: "filter contrast-150" },
+  ];
 
   // Fetch product details on load
   useEffect(() => {
@@ -89,7 +99,7 @@ export default function ProductPage({ params }) {
         <div className="space-x-4 flex items-center">
           <Link href="/profile">
             <Image
-              src="/profile.png" // You can replace this with an actual profile image or icon
+              src="/profile.png"
               alt="User Profile"
               width={40}
               height={40}
@@ -109,10 +119,10 @@ export default function ProductPage({ params }) {
       </nav>
 
       {/* Product Details Section */}
-      <section className="p-6 sm:p-12 lg:p-16">
-        <div className="max-w-7xl mx-auto flex flex-col-reverse lg:flex-row items-center space-y-6 lg:space-y-0 lg:space-x-12">
-          {/* Product Image */}
-          <div className="w-full lg:h-[70vh] h-[50vh] mb-8 lg:mb-0">
+      <section className="p-6 sm:p-12 lg:p-16 relative">
+        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center space-y-6 lg:space-y-0 lg:space-x-12">
+          {/* Main Product Image */}
+          <div className="w-full lg:h-[70vh] h-[50vh] flex justify-center items-center">
             <Image
               src={
                 product.img && !product.img.startsWith("https://example.com")
@@ -120,9 +130,9 @@ export default function ProductPage({ params }) {
                   : "/placeholder.png"
               }
               alt={product.name}
-              width={400} // Adjust width here
-              height={400} // Adjust height here
-              className="object-cover w-full h-full rounded-lg shadow-lg"
+              width={400}
+              height={600}
+              className={`rounded-lg shadow-lg ${activeFilter}`}
             />
           </div>
 
@@ -135,31 +145,21 @@ export default function ProductPage({ params }) {
               {product.description}
             </p>
 
-            {/* Product Category and Rating */}
-            <div className="mt-6 flex items-center space-x-4">
-              <span className="text-sm text-gray-500">{product.category}</span>
-              <div className="flex items-center">
-                {/* Render stars horizontally based on the rating */}
-                <div className="flex space-x-1">
-                  {Array.from({ length: 5 }, (_, i) => (
-                    <svg
-                      key={i}
-                      className={`h-5 w-5 ${i < product.rating ? "text-yellow-400" : "text-gray-300"}`}
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                      aria-hidden="true"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M10 15.27l4.14 2.18-1.11-4.86L18 8.47l-4.91-.42L10 3 7.91 8.05 3 8.47l3.86 3.12-1.11 4.86L10 15.27z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  ))}
-                </div>
-                <span className="ml-2 text-sm text-gray-500">({product.rating})</span>
-              </div>
+            {/* Product Filters */}
+            <div className="mt-6 flex space-x-4">
+              {filters.map((filter) => (
+                <button
+                  key={filter.name}
+                  onClick={() => setActiveFilter(filter.className)}
+                  className={`p-2 rounded-lg ${
+                    activeFilter === filter.className
+                      ? "bg-indigo-500 text-white"
+                      : "bg-gray-200 text-gray-800"
+                  }`}
+                >
+                  {filter.name}
+                </button>
+              ))}
             </div>
 
             <p className="mt-6 text-2xl font-semibold text-gray-800">
@@ -172,6 +172,25 @@ export default function ProductPage({ params }) {
               </button>
             </div>
           </div>
+        </div>
+
+        {/* Thumbnails for filters */}
+        <div className="flex space-x-4 mt-[-30px] justify-center">
+          {filters.map((filter) => (
+            <Image
+              key={filter.name}
+              src={
+                product.img && !product.img.startsWith("https://example.com")
+                  ? product.img
+                  : "/placeholder.png"
+              }
+              alt={filter.name}
+              width={80}
+              height={80}
+              className={`cursor-pointer rounded-md border border-gray-300 ${filter.className}`}
+              onClick={() => setActiveFilter(filter.className)}
+            />
+          ))}
         </div>
       </section>
 

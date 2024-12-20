@@ -73,6 +73,7 @@ export default function Signup() {
 
       const data = await response.json();
       localStorage.setItem("authToken", data.token);
+      localStorage.setItem("userId", data.userId );
       setTimeout(() => {
         window.location.href = "/dashboard";
       },1000)

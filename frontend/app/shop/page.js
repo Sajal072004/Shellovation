@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from 'next/navigation'
 
 export default function ShopPage() {
   const [products, setProducts] = useState([]);
@@ -10,6 +11,8 @@ export default function ShopPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const router = useRouter();
 
   // Fetch all products and categories
   useEffect(() => {
@@ -106,6 +109,9 @@ export default function ShopPage() {
             >
               All
             </button>
+            <button className="py-2 px-4 bg-gray-400 rounded-lg text-white" onClick={() => router.push('/categories')}>
+              Browse by Categories
+            </button>
             {categories && categories.map((category) => (
               <button
                 key={category}
@@ -120,7 +126,7 @@ export default function ShopPage() {
           {/* Product Listing */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {filteredProducts.map((product) => (
-              <div key={product.id} className="bg-white shadow-lg rounded-lg overflow-hidden">
+              <div key={product._id} className="bg-white shadow-lg rounded-lg overflow-hidden">
                 <Image
                   src={product.img || '/placeholder.png'} 
                   alt={product.name}
