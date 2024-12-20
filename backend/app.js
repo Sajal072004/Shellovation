@@ -17,6 +17,7 @@ const Product = require('./models/product');
 const app = express();
 const Order = require('./models/order');
 const User = require('./models/user');
+const Address = require('./models/address');
 
 // Middleware
 app.use(cors({
@@ -32,12 +33,12 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(
   session({
-    secret: "a57cb2f7c4a1ef3a8a3c6a5bf213d998812de8fc7bb47da8b7347a92f9ec48d9",
+    secret: process.env.SECRET,
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
-      mongoUrl: "mongodb+srv://ecommerce:ecommerce@ecommerce.dunf0.mongodb.net/",
-      collectionName: 'sessions',
+      mongoUrl: process.env.MONGO_URL,
+      collectionName: 'sahiba',
     }),
     cookie: {
       secure: false,
@@ -214,7 +215,6 @@ app.get('/product/:productId', async (req, res) => {
   }
 });
 
-// Update Stock Status Route
 app.post('/instock-update', async (req, res) => {
   try {
     console.log("instock update url is hit");
@@ -306,13 +306,7 @@ app.get('/assign-productid', async (req, res) => {
     });
   }
 });
-// Address Schema
-const addressSchema = new mongoose.Schema({
-  userId: { type: String, unique: true },
-  address: String
-});
 
-const Address = mongoose.model('Address', addressSchema);
 
 // Update or Create Address Route
 app.post('/update-address', async (req, res) => {

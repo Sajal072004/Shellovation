@@ -162,7 +162,7 @@ export default function Dashboard() {
             <div className="absolute bottom-0 left-0 p-6 text-white">
               <h3 className="text-2xl font-semibold">Men's Clothing</h3>
               <Link
-                href="/shop/men"
+                href="/categories"
                 className="bg-red-500 text-white px-4 py-2 rounded-lg mt-4 inline-block hover:bg-red-600"
               >
                 Shop Now
@@ -183,7 +183,7 @@ export default function Dashboard() {
             <div className="absolute bottom-0 left-0 p-6 text-white">
               <h3 className="text-2xl font-semibold">Women's Clothing</h3>
               <Link
-                href="/shop/women"
+                href="/categories"
                 className="bg-red-500 text-white px-4 py-2 rounded-lg mt-4 inline-block hover:bg-red-600"
               >
                 Shop Now
@@ -204,7 +204,7 @@ export default function Dashboard() {
             <div className="absolute bottom-0 left-0 p-6 text-white">
               <h3 className="text-2xl font-semibold">Accessories</h3>
               <Link
-                href="/shop/accessories"
+                href="/categories"
                 className="bg-red-500 text-white px-4 py-2 rounded-lg mt-4 inline-block hover:bg-red-600"
               >
                 Shop Now
@@ -231,7 +231,7 @@ export default function Dashboard() {
                 <h3 className="text-xl font-semibold text-gray-800">{product.name}</h3>
                 <p className="mt-2 text-gray-600">${product.price}</p>
                 <Link
-                  href={`/shop/${product.id}`}
+                  href={`/shop/${product._id}`}
                   className="bg-red-500 text-white px-6 py-2 rounded-lg mt-4 inline-block hover:bg-red-600"
                 >
                   View Details
